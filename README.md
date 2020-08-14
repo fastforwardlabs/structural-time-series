@@ -19,3 +19,4 @@ Forecasts are made on 2019 data, and MAPE is reported for the whole calendar yea
 - [ ] The `app.R` script surfaces a simple brush-to-zoom timeseries viewer as a Shiny app. This should be an Application.
 - [ ] `app.R` looks for a csv file that no longer exists under the most recent data fetching/loading structure.
 - [ ] The data fetching util should automatically create the `data` directory if it doesn't exist. Use [pathlib](https://docs.python.org/3/library/pathlib.html).
+- [ ] Make `sts` module pip-installable.
