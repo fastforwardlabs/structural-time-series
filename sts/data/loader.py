@@ -6,7 +6,7 @@ import pandas as pd
 
 
 def load_california_electricity_demand(
-    filepath='demand.json',
+    filepath='data/demand.json',
     api_key_env='EIA_API_KEY'):
     
     data = read_or_download_data(filepath, api_key_env)
@@ -15,6 +15,7 @@ def load_california_electricity_demand(
         json_to_df(data)
         .rename(columns={0: 'ds', 1: 'y'})
         .assign(ds=utc_to_pst)
+        .assign(ds=lambda df: df.ds.dt.tz_localize(None))
     )
     return df
 
@@ -38,7 +39,7 @@ def read_json(file):
     return data
 
 
-def write_json(data, filepath='demand.json'):
+def write_json(data, filepath):
     with open(filepath, 'w') as file:
         json.dump(data, file)
 
