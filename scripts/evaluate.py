@@ -58,7 +58,7 @@ prophet_mape = prophet_results.ape.mean()
 # ## Compare
 
 print(f'Baseline MAPE over 2019: {baseline_mape:.3f}')
-print(f'Baseline MAPE over 2019: {prophet_mape:.3f}')
+print(f'Prophet MAPE over 2019: {prophet_mape:.3f}')
 
 # There are problems with MAPE.
 # Should investigate MASE (https://robjhyndman.com/papers/mase.pdf)
