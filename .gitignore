@@ -144,3 +144,4 @@ node_modules
 __pycache__
 .*
 !.gitignore
+data/
