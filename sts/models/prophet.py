@@ -20,27 +20,31 @@ def seasonal_daily_prophet_model(df):
     )
     model.add_seasonality(
         name='winter_weekday',
-        period=24,
+        period=1,
         fourier_order=4,
-        condition_name='winter_weekday'
+        condition_name='winter_weekday',
+        prior_scale=25
     )
     model.add_seasonality(
         name='winter_weekend',
-        period=24,
+        period=1,
         fourier_order=4,
-        condition_name='winter_weekend'
+        condition_name='winter_weekend',
+        prior_scale=25
     )
     model.add_seasonality(
         name='summer_weekday',
-        period=24,
+        period=1,
         fourier_order=4,
-        condition_name='summer_weekday'
+        condition_name='summer_weekday',
+        prior_scale=25
     )
     model.add_seasonality(
         name='summer_weekend',
-        period=24,
+        period=1,
         fourier_order=4,
-        condition_name='summer_weekend'
+        condition_name='summer_weekend',
+        prior_scale=25
     )
     df = add_season_weekday_indicators(df)
     model.fit(df)
