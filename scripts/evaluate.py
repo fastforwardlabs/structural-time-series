@@ -12,6 +12,7 @@ from sts.data.loader import load_california_electricity_demand
 # Load the data
 
 df = load_california_electricity_demand()
+df['y'] = df.y.apply(np.log)
 
 
 # ## Baseline
