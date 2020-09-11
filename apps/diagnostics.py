@@ -109,7 +109,9 @@ fig.update_xaxes(
     rangeslider_visible=True,
     rangeselector=dict(
         buttons=list([
+            dict(count=7, label="1w", step="day", stepmode="backward"),
             dict(count=1, label="1m", step="month", stepmode="backward"),
+            dict(count=3, label="3m", step="month", stepmode="backward"),
             dict(count=6, label="6m", step="month", stepmode="backward"),
             dict(count=1, label="YTD", step="year", stepmode="todate"),
             dict(count=1, label="1y", step="year", stepmode="backward"),
@@ -151,7 +153,7 @@ residuals = (df['y'] - df[active_model])
 st.plotly_chart(px.histogram(df, x=residuals, color_discrete_sequence=["#00828c"]))
 
 
-"Autocorrelation plots."
+"Autocorrelation of the residuals."
 plot_acf(x=residuals)
 st.pyplot()
 
