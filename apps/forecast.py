@@ -6,15 +6,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as px
 
-st.title("California Electricity Demand Weekly Forecast")
+st.title("California Electricity Demand Forecast")
 
 
 # Data loading and selection
-
-start_date, end_date = st.date_input(
-  "Select a forecast range",
-  [datetime.date(2019,1,1), datetime.date(2020,1,1)] # replace with now, now + 1 year
-)
 
 data_loading = st.text("Loading data...")
 
@@ -25,26 +20,48 @@ def load_data():
     return data
 
 @st.cache(allow_output_mutation=True)
-def sample(data):
-    return data.sample(1, axis="columns")
+def samples(data):
+    return data.sample(10, axis="columns")
+
 
 data = load_data()
+
+start_date, end_date = st.date_input(
+    "Select a forecast range",
+    [datetime.date(2020,1,1), datetime.date(2020,12,31)] # replace with now, now + 1 year
+)
+
 data = data[(data.index.date >= start_date) & (data.index.date <= end_date)]
 data_loading.text("")
 
 
 # Main forecast plot
 
-mean_forecast = data.mean(axis="columns")
-
 generating_chart = st.text("Generating chart")
+mean_forecast = data.mean(axis="columns")
+sample_forecasts = samples(data).reset_index().melt(id_vars='ds')
+
+
 line_chart = px.line(
-  mean_forecast,
-  title="Forecast",
-  color_discrete_sequence=["#00828c"]
+    sample_forecasts,
+    x='ds',
+    y='value',
+    line_group='variable',
+    color_discrete_sequence=["rgba(0,130,140,0.1)"],
+
+)
+line_chart.add_scatter(
+    x=mean_forecast.index,
+    y=mean_forecast,
+    mode='lines',
+    marker=dict(color="rgba(0,130,140,1)")
 )
 line_chart.update_xaxes(range=[start_date, end_date])
-line_chart.update_layout(showlegend=False)
+line_chart.update_layout(
+    showlegend=False,
+    xaxis_title="Datetime (hourly increments)",
+    yaxis_title="Megawatthours"
+)
 st.plotly_chart(line_chart)
 generating_chart.text("")
 
@@ -55,24 +72,40 @@ data_sum = data.sum()
 _min = float(data_sum.min())
 _max = float(data_sum.max())
 
+
 threshold = st.slider(
-  "Threshold (Terawatthours)",
-  min_value = _min/1e6,
-  max_value = _max/1e6
+    "Threshold (Megawatthours)",
+    min_value = _min,
+    max_value = _max,
+    format = "%.2e"
 )
 
-prob_exceed = data_sum[data_sum > threshold*1e6].count() / data_sum.count()
+prob_exceed = data_sum[data_sum > threshold].count() / data_sum.count()
 
-st.text(f"""
-    The probability of demand exceeding a threshold of {threshold}
-    in the selected date range is {prob_exceed}.
+st.markdown(f"""
+    The most likely total demand between {start_date} and {end_date}
+    is **{mean_forecast.mean():.2e}** Megawatthours.
+""")
+
+st.markdown(f"""
+    The probability of the total demand between {start_date} and {end_date}
+    being more than {threshold:.2e} Megawatthours
+    is **{100*prob_exceed:.1f}**%.
+""")
+
+st.markdown("""
+
 """)
 
 hist = px.histogram(
-  data_sum[data_sum > threshold*1e6],
+  data_sum[data_sum > threshold],
   title="Possible total electricity demand levels",
   color_discrete_sequence=["#00828c"]
 )
 hist.update_xaxes(range=[_min, _max])
-hist.update_layout(showlegend=False)
+hist.update_layout(
+  showlegend=False,
+  xaxis_title="Megawatthours",
+  yaxis_title="Count (of 1000 simulated futures)"
+)
 st.plotly_chart(hist)
