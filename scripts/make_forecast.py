@@ -49,7 +49,7 @@ prediction_df = (
     .merge(pd.DataFrame(predictions), left_index=True, right_index=True)
     .drop(['winter_weekday', 'winter_weekend', 'summer_weekday', 'summer_weekend'],
           axis='columns')
-    [future.ds.dt.year == 2019]
+    [future.ds.dt.year >= 2020]
 )
 
 

@@ -16,35 +16,32 @@ def multiplicative_prophet_model(df):
 def seasonal_daily_prophet_model(df):
     model = Prophet(
         daily_seasonality=False,
-        yearly_seasonality=20
+        yearly_seasonality=20,
+        changepoint_prior_scale=0.001
     )
     model.add_seasonality(
         name='winter_weekday',
         period=1,
         fourier_order=12,
-        condition_name='winter_weekday',
-        prior_scale=25
+        condition_name='winter_weekday'
     )
     model.add_seasonality(
         name='winter_weekend',
         period=1,
         fourier_order=12,
-        condition_name='winter_weekend',
-        prior_scale=25
+        condition_name='winter_weekend'
     )
     model.add_seasonality(
         name='summer_weekday',
         period=1,
         fourier_order=12,
-        condition_name='summer_weekday',
-        prior_scale=25
+        condition_name='summer_weekday'
     )
     model.add_seasonality(
         name='summer_weekend',
         period=1,
         fourier_order=12,
-        condition_name='summer_weekend',
-        prior_scale=25
+        condition_name='summer_weekend'
     )
     model.add_country_holidays(country_name='US')
     df = add_season_weekday_indicators(df)
