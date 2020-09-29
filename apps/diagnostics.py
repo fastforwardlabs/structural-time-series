@@ -22,9 +22,7 @@ data_loading = st.text("Loading data...")
 ## Model comparison
 """
 
-df = load_california_electricity_demand()
-
-forecast_list = os.listdir(FORECAST_DIRECTORY)
+df = load_california_electricity_demand().sort_values('ds')
 
 def read_forecast(filename):
     name = filename.split('.')[0]
@@ -38,6 +36,8 @@ def read_forecast(filename):
 
 
 # ! Imperative, do stuff code.
+forecast_list = os.listdir(FORECAST_DIRECTORY)
+
 for f in forecast_list:
     df = df.merge(read_forecast(f), on='ds')
 
@@ -46,6 +46,10 @@ data_loading.text("")
 
 model_names = [x for x in df.columns if x not in ['ds', 'y']]
 
+df_train = df[df.ds.dt.year < 2019]
+df_2018 = df[df.ds.dt.year == 2018]
+df_2019 = df[df.ds.dt.year == 2019]
+
 f"""
 There are {len(model_names)} models. Here is a basic comparison of their MAPE.
 """
@@ -53,12 +57,9 @@ There are {len(model_names)} models. Here is a basic comparison of their MAPE.
 def ape(df):
     return pd.DataFrame({m: np.abs(df.y - df[m]) / df.y for m in model_names})
 
-df_2018 = df[df.ds.dt.year == 2018]
-df_2019 = df[df.ds.dt.year == 2019]
-
 st.write(
     pd.DataFrame({
-        'all training': ape(df).mean().rename('MAPE'),
+        'all training':    ape(df_train).mean().rename('MAPE'),
         '2018 (training)': ape(df_2018).mean().rename('MAPE'),
         '2019  (holdout)': ape(df_2019).mean().rename('MAPE')
     }).transpose()
@@ -71,18 +72,20 @@ so that years are approximately aligned.
 """
 
 def mase_denominator(df):
-    naive_forecast = year_ahead_hourly_forecast(df).dropna()
-    denom = np.sum(np.abs((naive_forecast - df.y).dropna())) / (naive_forecast.size - 1)
+    naive_forecast = year_ahead_hourly_forecast(df)
+    denom = np.sum(
+      np.abs((naive_forecast - df.y).dropna())
+    ) / len(naive_forecast.dropna())
     return denom
 
-denom = mase_denominator(df)
+denom = mase_denominator(df_train)
 
 def mase(df):
     return pd.DataFrame({m: np.abs(df.y - df[m]) / denom for m in model_names})
 
 st.write(
     pd.DataFrame({
-        'all training': mase(df).mean().rename('MASE'),
+        'all training':    mase(df_train).mean().rename('MASE'),
         '2018 (training)': mase(df_2018).mean().rename('MASE'),
         '2019  (holdout)': mase(df_2019).mean().rename('MASE')
     }).transpose()

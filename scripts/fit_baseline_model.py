@@ -10,7 +10,6 @@ from sts.models.baselines import year_ahead_hourly_forecast
 
 df = load_california_electricity_demand()
 
-
 # ## Baseline
 # Reproduce observed values exactly 52 weeks prior as forecast.
 
@@ -18,7 +17,6 @@ baseline = (
     df
     .sort_values('ds')
     .assign(yhat=year_ahead_hourly_forecast)
-#    [(df['ds'] >= '2019') & (df['ds'] < '2020')]
 )
 
 
