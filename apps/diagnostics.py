@@ -141,6 +141,14 @@ st.plotly_chart(forecast_chart)
 ### Diagnostics
 """
 
+data_set = st.selectbox("Dataset", ['Train', 'Test', 'Combined'])
+
+if data_set == 'Train':
+    df = df_train
+elif data_set == 'Test':
+    df = df_2019
+
+
 "Scatter plot of the true values (x) vs forecast values (y)."
 
 scatter_chart = go.Figure(data=go.Scatter(
