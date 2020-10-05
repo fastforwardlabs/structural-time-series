@@ -5,13 +5,12 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-import matplotlib.pyplot as plt
-from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+from statsmodels.tsa.stattools import acf, pacf
 
 from sts.data.loader import load_california_electricity_demand
 from sts.models.baselines import year_ahead_hourly_forecast
 
-FORECAST_DIRECTORY = 'data/forecasts'
+FORECAST_DIRECTORY = "data/forecasts"
 
 
 st.title("California Electricity Demand Model Diagnostics")
@@ -22,14 +21,14 @@ data_loading = st.text("Loading data...")
 ## Model comparison
 """
 
-df = load_california_electricity_demand().sort_values('ds')
+df = load_california_electricity_demand().sort_values("ds")
 
 def read_forecast(filename):
-    name = filename.split('.')[0]
+    name = filename.split(".")[0]
     df = (
         pd
-        .read_csv(FORECAST_DIRECTORY+'/'+filename)
-        .rename(columns={'yhat': name})
+        .read_csv(FORECAST_DIRECTORY+"/"+filename)
+        .rename(columns={"yhat": name})
         .assign(ds=lambda df: pd.to_datetime(df.ds))
     )
     return df
@@ -39,12 +38,12 @@ def read_forecast(filename):
 forecast_list = os.listdir(FORECAST_DIRECTORY)
 
 for f in forecast_list:
-    df = df.merge(read_forecast(f), on='ds')
+    df = df.merge(read_forecast(f), on="ds")
 
 
 data_loading.text("")
 
-model_names = [x for x in df.columns if x not in ['ds', 'y']]
+model_names = [x for x in df.columns if x not in ["ds", "y"]]
 
 df_train = df[df.ds.dt.year < 2019]
 df_2018 = df[df.ds.dt.year == 2018]
@@ -59,9 +58,9 @@ def ape(df):
 
 st.write(
     pd.DataFrame({
-        'all training':    ape(df_train).mean().rename('MAPE'),
-        '2018 (training)': ape(df_2018).mean().rename('MAPE'),
-        '2019  (holdout)': ape(df_2019).mean().rename('MAPE')
+        "all training":    ape(df_train).mean().rename("MAPE"),
+        "2018 (training)": ape(df_2018).mean().rename("MAPE"),
+        "2019  (holdout)": ape(df_2019).mean().rename("MAPE")
     }).transpose()
 )
 
@@ -85,9 +84,9 @@ def mase(df):
 
 st.write(
     pd.DataFrame({
-        'all training':    mase(df_train).mean().rename('MASE'),
-        '2018 (training)': mase(df_2018).mean().rename('MASE'),
-        '2019  (holdout)': mase(df_2019).mean().rename('MASE')
+        "all training":    mase(df_train).mean().rename("MASE"),
+        "2018 (training)": mase(df_2018).mean().rename("MASE"),
+        "2019  (holdout)": mase(df_2019).mean().rename("MASE")
     }).transpose()
 )
 
@@ -97,18 +96,18 @@ st.write(
 We can compute some more detailed diagnostics for each model individually.
 """
 
-active_model = st.selectbox('Model', model_names)
+active_model = st.selectbox("Model", model_names)
 
 """
 ### The forecast
 First, we should see the forecast vs actuals.
 """
 
-fig = px.line(
+forecast_chart = px.line(
     df, x='ds', y=['y', active_model],
     color_discrete_sequence=["#ff8300","#00828c"]
 )
-fig.update_xaxes(
+forecast_chart.update_xaxes(
     rangeslider_visible=True,
     rangeselector=dict(
         buttons=list([
@@ -122,7 +121,9 @@ fig.update_xaxes(
         ])
     )
 )
-fig.update_layout(
+forecast_chart.update_layout(
+    xaxis_title="Datetime (hourly increments)",
+    yaxis_title="Demand (Megawatt-hours)",
     legend=dict(
         orientation="h",
         yanchor="bottom",
@@ -133,7 +134,7 @@ fig.update_layout(
     ),
     legend_title_text=""
 )
-st.plotly_chart(fig)
+st.plotly_chart(forecast_chart)
 
 
 """
@@ -142,23 +143,82 @@ st.plotly_chart(fig)
 
 "Scatter plot of the true values (x) vs forecast values (y)."
 
-st.plotly_chart(go.Figure(data=go.Scatter(
+scatter_chart = go.Figure(data=go.Scatter(
     x=df.y, y=df[active_model],
-    mode='markers',
-    marker=dict(color="#00828c")
-)))
+    mode="markers",
+    marker=dict(color="#00828c"),
+))
+scatter_chart.update_layout(
+    xaxis_title="True demand (Megawatt-hours)",
+    yaxis_title="Forecast demand (Megawatt-hours)"
+)
 
+st.plotly_chart(scatter_chart)
 
-residuals = (df['y'] - df[active_model])
+residuals = (df["y"] - df[active_model]).dropna()
 
 "Distribution of the residuals."
 
-st.plotly_chart(px.histogram(df, x=residuals, color_discrete_sequence=["#00828c"]))
+residual_chart = px.histogram(
+    df, x=residuals, color_discrete_sequence=["#00828c"]
+)
+residual_chart.update_layout(
+    xaxis_title="Residual (true demand - forecast demand) (Megawatt-hours)",
+    yaxis_title="Count"
+)
+
+st.plotly_chart(residual_chart)
 
 
-"Autocorrelation of the residuals."
-plot_acf(x=residuals)
-st.pyplot()
+"Autocorrelation and partial autocorrelation of the residuals."
 
-plot_pacf(x=residuals)
-st.pyplot()
+autocorrelation, conf_intervals = acf(residuals, alpha=0.05, nlags=48)
+
+autocorrelation_df = pd.DataFrame({
+    "autocorrelation": autocorrelation,
+    # center confidence intervals on zero,
+    # so that null hypothesis is zero autocorrelation
+    "ci_lower": conf_intervals[:,0]-autocorrelation,
+    "ci_upper": conf_intervals[:,1]-autocorrelation
+})
+autocorrelation_chart = px.bar(
+    autocorrelation_df,
+    x=autocorrelation_df.index,
+    y=["autocorrelation","ci_lower", "ci_upper"],
+    color_discrete_sequence=["#00828c", "#ff8300", "#ff8300"],
+    barmode="overlay"
+)
+autocorrelation_chart.update_layout(
+    xaxis_title="Timestep (hours)",
+    yaxis_title="Autocorrelation",
+    showlegend=False
+)
+
+st.plotly_chart(autocorrelation_chart)
+
+
+partial_autocorrelation, partial_conf_intervals = pacf(
+    residuals, alpha=0.05, nlags=48
+)
+
+partial_autocorrelation_df = pd.DataFrame({
+    "partial_autocorrelation": partial_autocorrelation,
+    # center confidence intervals on zero,
+    # so that null hypothesis is zero partial autocorrelation
+    "ci_lower": partial_conf_intervals[:,0]-partial_autocorrelation,
+    "ci_upper": partial_conf_intervals[:,1]-partial_autocorrelation
+})
+partial_autocorrelation_chart = px.bar(
+    partial_autocorrelation_df,
+    x=partial_autocorrelation_df.index,
+    y=["partial_autocorrelation", "ci_lower", "ci_upper"],
+    color_discrete_sequence=["#00828c", "#ff8300", "#ff8300"],
+    barmode='overlay'
+)
+partial_autocorrelation_chart.update_layout(
+    xaxis_title="Timestep (hours)",
+    yaxis_title="Partial autocorrelation",
+    showlegend=False
+)
+
+st.plotly_chart(partial_autocorrelation_chart)
