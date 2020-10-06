@@ -10,18 +10,13 @@ from statsmodels.tsa.stattools import acf, pacf
 from sts.data.loader import load_california_electricity_demand
 from sts.models.baselines import year_ahead_hourly_forecast
 
+
 FORECAST_DIRECTORY = "data/forecasts"
 
 
 st.title("California Electricity Demand Model Diagnostics")
 
-data_loading = st.text("Loading data...")
-
-"""
-## Model comparison
-"""
-
-df = load_california_electricity_demand().sort_values("ds")
+# first, load true demand data and forecasts
 
 def read_forecast(filename):
     name = filename.split(".")[0]
@@ -34,23 +29,32 @@ def read_forecast(filename):
     return df
 
 
-# ! Imperative, do stuff code.
-forecast_list = os.listdir(FORECAST_DIRECTORY)
+@st.cache(allow_output_mutation=True)
+def load_all_forecasts():
+    df = load_california_electricity_demand().sort_values("ds")
+    forecast_list = os.listdir(FORECAST_DIRECTORY)
+    for f in forecast_list:
+        df = df.merge(read_forecast(f), on="ds")
+    return df
 
-for f in forecast_list:
-    df = df.merge(read_forecast(f), on="ds")
 
-
+data_loading = st.text("Loading data...")
+df = load_all_forecasts()
 data_loading.text("")
-
-model_names = [x for x in df.columns if x not in ["ds", "y"]]
 
 df_train = df[df.ds.dt.year < 2019]
 df_2018 = df[df.ds.dt.year == 2018]
 df_2019 = df[df.ds.dt.year == 2019]
 
+model_names = [x for x in df.columns if x not in ["ds", "y"]]
+
+
 f"""
-There are {len(model_names)} models. Here is a basic comparison of their MAPE.
+## Model comparison
+There are {len(model_names)} models. Here is a comparison of their MAPE for select data slices.
+We compare a held out test set (2019) to the whole training set through 2018 and also
+2018 in isolation. 2018 is included for being one complete period in the training set
+of equal length to 2019.
 """
 
 def ape(df):
@@ -64,10 +68,13 @@ st.write(
     }).transpose()
 )
 
+
 """
-A better metric for this kind of time series is MASE.
+---
+Another metric for this kind of time series is [MASE](https://en.wikipedia.org/wiki/Mean_absolute_scaled_error).
 We will use a seasonal variant, where the season is defined to be 52 weeks long,
 so that years are approximately aligned.
+MASE measures error relative to the baseline, so a lower score is better.
 """
 
 def mase_denominator(df):
@@ -92,15 +99,16 @@ st.write(
 
 
 """
+---
 ## Model drill-down
 We can compute some more detailed diagnostics for each model individually.
 """
-
 active_model = st.selectbox("Model", model_names)
+
 
 """
 ### The forecast
-First, we should see the forecast vs actuals.
+First, we should see the forecast vs true, observed values.
 """
 
 forecast_chart = px.line(
@@ -138,6 +146,7 @@ st.plotly_chart(forecast_chart)
 
 
 """
+---
 ### Diagnostics
 """
 
@@ -149,12 +158,17 @@ elif data_set == 'Test':
     df = df_2019
 
 
-"Scatter plot of the true values (x) vs forecast values (y)."
+"""
+---
+Scatter plot of the true values vs forecast values.
+This plot will be heavily overplotted, but the overall shape should tell us
+whether we are over- or under-predicting.
+"""
 
 scatter_chart = go.Figure(data=go.Scatter(
     x=df.y, y=df[active_model],
     mode="markers",
-    marker=dict(color="#00828c"),
+    marker=dict(color="#00828c", opacity=0.2),
 ))
 scatter_chart.update_layout(
     xaxis_title="True demand (Megawatt-hours)",
@@ -165,7 +179,12 @@ st.plotly_chart(scatter_chart)
 
 residuals = (df["y"] - df[active_model]).dropna()
 
-"Distribution of the residuals."
+
+"""
+---
+Here is the marginal distribution of the residuals.
+We expect it to be symmetric, approximately normal, and centered at zero.
+"""
 
 residual_chart = px.histogram(
     df, x=residuals, color_discrete_sequence=["#00828c"]
@@ -178,7 +197,15 @@ residual_chart.update_layout(
 st.plotly_chart(residual_chart)
 
 
-"Autocorrelation and partial autocorrelation of the residuals."
+"""
+---
+The autocorrelation and partial autocorrelation of the residuals.
+Since none of our models try to model the error (with autoregressive terms), we may
+expect some autocorrelation.
+The orange bands represent the 95% confidence interval for the null hypothesis that
+there is no (partial) autocorrelation.
+Bars outside those bounds indicate high likelihood of autocorrelation.
+"""
 
 autocorrelation, conf_intervals = acf(residuals, alpha=0.05, nlags=48)
 
