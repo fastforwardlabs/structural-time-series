@@ -1,3 +1,5 @@
+import datetime
+
 import numpy as np
 import pandas as pd
 
@@ -8,7 +10,7 @@ from sts.models.prophet import (
 from sts.data.loader import load_california_electricity_demand
 
 
-# Load the data
+# Load all available data for training
 
 df = load_california_electricity_demand()
 
@@ -16,19 +18,9 @@ df = load_california_electricity_demand()
 df['y'] = df.y.apply(np.log)
 
 
-# Use pre-2019 to train
-
-train_df = (
-    df
-    [df['ds'].dt.year < 2020]
-    .sort_values('ds')
-    .reset_index(drop=True)
-)
-
-
 # Fit best current model
 
-model = seasonal_daily_prophet_model(train_df)
+model = seasonal_daily_prophet_model(df)
 
 
 # Make predictions
@@ -49,7 +41,7 @@ prediction_df = (
     .merge(pd.DataFrame(predictions), left_index=True, right_index=True)
     .drop(['winter_weekday', 'winter_weekend', 'summer_weekday', 'summer_weekend'],
           axis='columns')
-    [future.ds.dt.year >= 2020]
+    [future.ds.dt.date >= datetime.date.today()]
 )
 
 
