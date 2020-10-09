@@ -7,7 +7,8 @@ import pandas as pd
 
 def load_california_electricity_demand(
     filepath='data/demand.json',
-    api_key_env='EIA_API_KEY'):
+    api_key_env='EIA_API_KEY',
+    train_only=False):
     
     data = read_or_download_data(filepath, api_key_env)
         
@@ -16,7 +17,12 @@ def load_california_electricity_demand(
         .rename(columns={0: 'ds', 1: 'y'})
         .assign(ds=utc_to_pst)
         .assign(ds=lambda df: df.ds.dt.tz_localize(None))
+        .sort_values('ds')
     )
+
+    if train_only:
+        df = remove_2019_and_later(df)
+
     return df
 
 
@@ -83,9 +89,5 @@ def utc_to_pst(df):
     return pst
 
 
-
-
-
-
-
-    
+def remove_2019_and_later(df):
+    return df[df['ds'] < '2019']#.sort_values('ds').reset_index(drop=True)

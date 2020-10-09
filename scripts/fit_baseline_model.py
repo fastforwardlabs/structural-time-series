@@ -22,9 +22,9 @@ baseline = (
 
 # ## Write
 # Write the forecast values to csv
-DIR = 'data/forecasts'
+DIR = 'data/forecasts/'
 
 if not os.path.exists(DIR):
     os.makedirs(DIR)
 
-baseline[['ds', 'yhat']].to_csv(DIR + '/baseline.csv', index=False)
+baseline[['ds', 'yhat']].to_csv(DIR + 'baseline.csv', index=False)
