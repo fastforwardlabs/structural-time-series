@@ -23,7 +23,7 @@ df['y'] = df.y.apply(np.log)
 model = seasonal_daily_prophet_model(df)
 
 
-# Make predictions
+# Make predictions for one year ahead of most recent training data
 
 future = add_season_weekday_indicators(
     model.make_future_dataframe(periods = 24*365, freq='H')

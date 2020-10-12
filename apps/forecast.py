@@ -6,6 +6,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as px
 
+
+N_SAMPLES = 10
+
 st.title("California Electricity Demand Forecast")
 
 
@@ -22,6 +25,12 @@ def load_data():
 
 data = load_data()
 
+st.markdown("""
+    The forecast is generated for one year ahead of the most recent
+    observation. Please select the range of interest over which to view and
+    filter samples from the forecast distribution.
+""")
+
 start_date, end_date = st.date_input(
     "Select a forecast range",
     [data.index.min().date(), data.index.max().date()]
@@ -32,13 +41,19 @@ data_loading.text("")
 
 @st.cache(hash_funcs={pd.DataFrame: lambda _: None})
 def samples(df):
-    return df.sample(10, axis="columns").reset_index().melt(id_vars='ds')
+    return df.sample(N_SAMPLES, axis="columns").reset_index().melt(id_vars='ds')
 
 @st.cache(hash_funcs={pd.DataFrame: lambda _: None})
 def mean(df):
     return df.mean(axis="columns")
 
 # Main forecast plot
+
+st.markdown(f"""
+    The chart below shows the mean forecast (based on 1000 samples),
+    and {N_SAMPLES} individual samples, which can be thought of as
+    "possible futures".
+""")
 
 generating_chart = st.text("Generating chart")
 mean_forecast = mean(subset)
@@ -75,6 +90,15 @@ data_sum = subset.sum()
 _min = float(data_sum.min())
 _max = float(data_sum.max())
 
+st.markdown(f"""
+    The mean estimate of the aggregate demand from {start_date} to {end_date}
+    is **{data_sum.mean():.2e}** Megawatt-hours.
+""")
+
+st.markdown("""
+    We can assess the probability of exceeding a given aggregate demand over
+    the selected period. Choose the threshold of interest below.
+""")
 
 threshold = st.slider(
     "Threshold (Megawatt-hours)",
@@ -86,18 +110,15 @@ threshold = st.slider(
 prob_exceed = data_sum[data_sum > threshold].count() / data_sum.count()
 
 st.markdown(f"""
-    The most likely total demand between {start_date} and {end_date}
-    is **{data_sum.mean():.2e}** Megawatt-hours.
-""")
-
-st.markdown(f"""
-    The probability of the total demand between {start_date} and {end_date}
-    being more than {threshold:.2e} Megawatt-hours
-    is **{100*prob_exceed:.1f}**%.
+    The probability of the aggregate demand between {start_date} and {end_date}
+    being more than {threshold:.2e} Megawatt-hours is
+    **{100*prob_exceed:.1f}**%.
 """)
 
 st.markdown("""
-
+    The histogram below shows the probability distribution of possible
+    aggregate demands, cut off at the threshold selected.
+    The higher the count for a given demand, the more likely that future is.
 """)
 
 hist = px.histogram(
