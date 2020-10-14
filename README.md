@@ -6,7 +6,10 @@ It provides an example application of generalized additive models (via the [Prop
 The primary output of this repository is a small application exposing a probablistic forecast and interface for asking a probabilistic question against it.
 The final app looks like this.
 
-![Forecasting app interface](img/app.png)
+<img src="img/app.png" alt="Forecasting app interface" width="40%">
+
+Instructions are given both for general use (on a laptop, say), and for Cloudera CML and CDSW.
+We'll first describe what's here, then go through how to run everything.
 
 ## Structure
 
@@ -15,6 +18,7 @@ The folder structure of the repo is as follows
 ```
 .
 ├── apps      # Two small Streamlit applications.
+├── data      # This folder contains starter data, and is where forecasts will live.
 ├── scripts   # This is where all the code that does something lives.
 └── sts       # A small library of useful functions.
 ```
@@ -38,13 +42,13 @@ sts
 ```
 
 Building a small library of problem-specific abstractions allows us to reuse them in multiple places.
-The code in `data/loader.py`, for instance, is reused in most of the scripts and applications.
+The code in `data/loader.py`, is reused in most of the scripts and applications.
 In this case, we have closed model details (such as the number of Fourier terms to include in a given Prophet model) into the library.
-It would be trivial to pass such arguments though, if we wanted to, for instance, perform an extensive hyperparameter search.
+It would be trivial to pass these through as arguments though, if we wanted to perform an extensive hyperparameter search for example.
 
 ### `scripts`
 
-These imperative scripts are where the work of the analysis is done.
+These imperative scripts are where the _work_ of the analysis is done.
 Side-effectful actions such as I/O and model training occur in these scripts.
 
 ```
@@ -78,11 +82,11 @@ apps
 The diagnostic application serves two purposes.
 First, it computes reports top level metrics for any forecasts saved in the `data/forecasts` directory.
 
-![Diagnostic app showing model metrics](img/diagnostic-metrics.png)
+<img src="img/diagnostic-metrics.png" alt="Diagnostic app showing model metrics" width="40%">
 
 Second, it provides a few diagnostic charts, including a zoomable forecast.
 
-![Diagnostic app showing chart of forecast](img/diagnostic-chart.png)
+<img src="img/diagnostic-chart.png" alt="Diagnostic app showing chart of forecast" width="40%">
 
 #### Forecast
 
@@ -113,16 +117,43 @@ In CML or CDSW, no virtual env is necessary. Instead, inside a Python 3 session,
 Next, install the `sts` module from this repository, with
 
 ```python
-pip install -e .
+pip3 install -e .
 ```
 
 from inside the root directory of this repo.
 
 ### Data
 
-Data source: [US Energy Information Administration](https://www.eia.gov/opendata/qb.php?category=3389936&sdid=EBA.CAL-ALL.D.H)
-Data dependencies will be downloaded on first use.
+We use historic California electricity demand data from the [US Energy Information Administration](https://www.eia.gov/opendata/qb.php?category=3389936&sdid=EBA.CAL-ALL.D.H).
 
+A full set of data through October 12th 2020 is included as a starter.
+More recent data can be fetched from the [EIA open data API](https://www.eia.gov/opendata/).
+Doing so requires an API key, which must be set as an the `EIA_API_KEY` environment variable for this project (another name may be used if ).
+To fetch new data, simply call the `load_california_electricity_demand` function from the `sts.data.loader` module.
+The code is set up to work directly with the json response to the EIA API.
+See the module for more details.
+
+### Scripts
+
+To fit models and generate forecasts, we call each script in turn from the `scripts` directory.
+
+```bash
+cd scripts/
+python3 fit_baseline_model.py
+python3 fit_simple_prophet_model.py
+python3 fit_complex_prophet_model.py
+python3 fit_complex_log_prophet_model.py
+```
+
+This will fit a series of models of increasing complexity and write their outputs (the mean forecast) to the `data/forecasts` directory.
+Launching the diagnostic app will show the metrics and diagnostic charts for each model.
+
+The most compex model wins.
+We can view its metrics when trained on the validation data (through 2019) by runnig the `validation_metrics.py` script.
+We can then make generate 1000 samples from the model trained on all available training datawith the `make_forecast.py` script.
+When those samples are written to disk, we can use the forecast app to investigate them.
+
+The additional script, `get_csv.py`, simply fetches and writes data as a csv, which is convenient for any ad hoc analytics and interactive exploration.
 
 ## Desiderata
 
