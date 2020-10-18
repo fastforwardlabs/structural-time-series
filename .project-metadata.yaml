@@ -8,11 +8,29 @@ api_version: 1
 
 environment_variables:
   EIA_API_KEY:
-    default: "SUPER AWESOME EIA KEY"
+    default: "EIA KEY"
     description: "EIA open data API key"
     prompt_user: false
 
 tasks:
+
+  - type: create_job
+    name: Install dependencies
+    entity_label: install_deps
+    script: install_deps.py
+    arguments: None  
+    short_summary: Create job to install project dependencies.
+    environment:
+      TASK_TYPE: CREATE/RUN_JOB
+    kernel: python3
+
+  - type: run_job
+    entity_label: install_deps
+    short_summary: Running install dependencies job.
+    long_summary: >-
+      Running the job to install dependencies. 
+
+
   - type: start_application
     name: Diagnostic app
     subdomain: diagnostics
