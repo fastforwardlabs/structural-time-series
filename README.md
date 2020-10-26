@@ -148,8 +148,8 @@ This will fit a series of models of increasing complexity and write their output
 Launching the diagnostic app will show the metrics and diagnostic charts for each model.
 
 The most compex model wins.
-We can view its metrics when trained on the validation data (through 2019) by running the `validation_metrics.py` script.
-We can then generate 1000 samples from the model trained on all available training data with the `make_forecast.py` script.
+We can view its metrics when trained on the validation data (through 2019) by running the `scripts/validation_metrics.py` script.
+We can then generate 1000 samples from the model trained on all available training data with the `scripts/make_forecast.py` script.
 When those samples are written to disk, we can use the forecast app to investigate them.
 
 The additional script, `get_csv.py`, simply fetches and writes data as a csv, which is convenient for any ad hoc analytics and interactive exploration.
