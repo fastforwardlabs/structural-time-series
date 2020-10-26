@@ -138,11 +138,10 @@ See the module for more details.
 To fit models and generate forecasts, we call each script in turn from the `scripts` directory.
 
 ```bash
-cd scripts/
-python3 fit_baseline_model.py
-python3 fit_simple_prophet_model.py
-python3 fit_complex_prophet_model.py
-python3 fit_complex_log_prophet_model.py
+python3 scripts/fit_baseline_model.py
+python3 scripts/fit_simple_prophet_model.py
+python3 scripts/fit_complex_prophet_model.py
+python3 scripts/fit_complex_log_prophet_model.py
 ```
 
 This will fit a series of models of increasing complexity and write their outputs (the mean forecast) to the `data/forecasts` directory.
