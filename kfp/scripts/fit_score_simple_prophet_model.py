@@ -1,0 +1,28 @@
+import pickle
+import argparse
+from sts.models.prophet import default_prophet_model
+
+
+def _fit_score_simple_prophet(data_df):
+
+    with open(data_df, 'rb') as f:
+        df = pickle.load(f)
+
+    # ## Prophet (Default)
+    # FB Prophet model, all default parameters.
+
+    model = default_prophet_model(df)
+
+    future = model.make_future_dataframe(periods = 8760, freq='H')
+    forecast = model.predict(future)
+
+    KFP_DIR = 'kfp/data/'
+
+    forecast[['ds', 'yhat']].to_csv(KFP_DIR + 'prophet_simple.csv', index=False)
+
+if __name__ == '__main__':
+    print("-----Fitting and Scoring Simple Prophet Model----")
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data_df')
+    args = parser.parse_args()
+    _fit_score_simple_prophet(args.data_df)
