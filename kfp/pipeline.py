@@ -21,3 +21,20 @@ def load_and_preprocess_op():
             'data_df': 'kfp/data/data_df.pkl'
         }
     )
+
+# define kubeflow pipeline
+
+@dsl.pipeline(
+    name='CFFL Structural-Time-Series Demo Pipeline',
+    description='A demo kubeflow pipeline.'
+)
+def cffl_sts_pipeline():
+    
+    _load_and_preprocess_op = load_and_preprocess_op()
+
+
+
+# create client connection and execute pipeline run
+
+client = kfp.Client(host=args.host)
+client.create_run_from_pipeline_func(boston_pipeline, arguments={})
