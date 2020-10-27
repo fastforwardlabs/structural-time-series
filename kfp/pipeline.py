@@ -3,6 +3,14 @@ import argparse
 import kfp
 from kfp import dsl
 
+# get host argument
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--host')
+args = parser.parse_args()
+
+# define pipeline componenets
+
 def load_and_preprocess_op():
 
     return dsl.ContainerOP(
