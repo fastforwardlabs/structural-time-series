@@ -25,6 +25,9 @@ def _fit_score_complex_prophet(train_df):
     forecast = model.predict(seasonal_future)
 
     KFP_DIR = 'kfp/data/'
+    
+    if not os.path.exists(KFP_DIR):
+        os.makedirs(KFP_DIR)
 
     forecast[['ds', 'yhat']].to_csv(KFP_DIR + 'prophet_complex.csv', index=False)
 
