@@ -19,36 +19,51 @@ def load_and_preprocess_op():
         command=['python3', 'kfp/scripts/load_and_preprocess.py'],
         arguments=[],
         file_outputs={
-            'data_df': '/usr/src/app/kfp/data/data_df.pkl'
+            'data_df': '/usr/src/app/kfp/data/data_df.pkl',
+            'train_df': '/usr/src/app/kfp/data/train_df.pkl'
         }
     )
 
-def fit_score_simple_prophet_op(data_df):
+def fit_score_simple_prophet_op(train_df):
 
     return dsl.ContainerOp(
         name='Fit and Score Simple Prophet Model',
         image='andrewrreed/cffl-sts-image:latest',
         command=['python3', 'kfp/scripts/fit_score_simple_prophet_model.py'],
         arguments=[
-            '--data_df', data_df
+            '--train_df', train_df
         ],
         file_outputs={
             'prophet_simple': '/usr/src/app/kfp/data/prophet_simple.csv'
         }
     )
 
-def fit_score_complex_prophet_op(data_df):
+def fit_score_complex_prophet_op(train_df):
 
     return dsl.ContainerOp(
         name='Fit and Score Complex Prophet Model',
         image='andrewrreed/cffl-sts-image:latest',
         command=['python3', 'kfp/scripts/fit_score_complex_prophet_model.py'],
         arguments=[
-            '--data_df', data_df
+            '--train_df', train_df
         ],
         file_outputs={
             'prophet_complex': '/usr/src/app/kfp/data/prophet_complex.csv'
         }
+    )
+
+def evaluate_models_op(prophet_simple, prophet_complex, data_df):
+
+    return dsl.ContainerOp(
+        name='Evaluate Both Models',
+        image='andrewrreed/cffl-sts-image:latest',
+        command=['python3', 'kfp/scripts/evaluate_models.py'],
+        arguments=[
+            '--prophet_simple', prophet_simple,
+            '--prophet_complex', prophet_complex,
+            '--data_df', data_df
+        ],
+        file_outputs={}
     )
 
 # define kubeflow pipeline
@@ -62,12 +77,18 @@ def cffl_sts_pipeline():
     _load_and_preprocess_op = load_and_preprocess_op()
 
     _fit_score_simple_prophet_op = fit_score_simple_prophet_op(
-        dsl.InputArgumentPath(_load_and_preprocess_op.outputs['data_df'])
+        dsl.InputArgumentPath(_load_and_preprocess_op.outputs['train_df'])
     ).after(_load_and_preprocess_op)
 
     _fit_score_complex_prophet_op = fit_score_complex_prophet_op(
-        dsl.InputArgumentPath(_load_and_preprocess_op.outputs['data_df'])
+        dsl.InputArgumentPath(_load_and_preprocess_op.outputs['train_df'])
     ).after(_load_and_preprocess_op)
+
+    _evaluate_models_op = evaluate_models_op(
+        dsl.InputArgumentPath(_fit_score_simple_prophet_op.outputs['prophet_simple']),
+        dsl.InputArgumentPath(_fit_score_complex_prophet_op.outputs['prophet_complex']),
+        dsl.InputArgumentPath(_load_and_preprocess_op.outputs['data_df'])
+    ).after( )
 
 
 # create client connection and execute pipeline run
