@@ -7,6 +7,7 @@ from kfp import dsl
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--host')
+parser.add_argument('--run_name')
 args = parser.parse_args()
 
 # define pipeline componenets
@@ -88,16 +89,19 @@ def cffl_sts_pipeline():
         dsl.InputArgumentPath(_fit_score_simple_prophet_op.outputs['prophet_simple']),
         dsl.InputArgumentPath(_fit_score_complex_prophet_op.outputs['prophet_complex']),
         dsl.InputArgumentPath(_load_and_preprocess_op.outputs['data_df'])
-    ).after()
+    ).after(_fit_score_complex_prophet_op)
 
-# compile and generate compressed kubeflow pipeline file locally
-kfp.compiler.Compiler().compile(cffl_sts_pipeline, 'cffl_sts_pipeline.yaml')
     
-# create client connection and execute pipeline run
+if __name__ == '__main__':
+    
+    # compile and generate compressed kubeflow pipeline file locally
+    kfp.compiler.Compiler().compile(cffl_sts_pipeline, 'cffl_sts_pipeline.yaml')
 
-client = kfp.Client(host=args.host)
-client.create_run_from_pipeline_func(cffl_sts_pipeline,
-                                     arguments={},
-                                     experiment_name='structural_time_series_demo',
-                                     run_name='test'
-)
+    # create client connection and execute pipeline run
+
+    client = kfp.Client(host=args.host)
+    client.create_run_from_pipeline_func(cffl_sts_pipeline,
+                                         arguments={},
+                                         experiment_name='structural_time_series_demo',
+                                         run_name=args.run_name
+    )

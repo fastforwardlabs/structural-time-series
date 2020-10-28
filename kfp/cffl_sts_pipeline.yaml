@@ -1,0 +1,81 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: cffl-structural-time-series-demo-pipeline-
+  annotations: {pipelines.kubeflow.org/kfp_sdk_version: 1.0.4, pipelines.kubeflow.org/pipeline_compilation_time: '2020-10-28T22:09:55.023153',
+    pipelines.kubeflow.org/pipeline_spec: '{"description": "A demo kubeflow pipeline.",
+      "name": "CFFL Structural-Time-Series Demo Pipeline"}'}
+  labels: {pipelines.kubeflow.org/kfp_sdk_version: 1.0.4}
+spec:
+  entrypoint: cffl-structural-time-series-demo-pipeline
+  templates:
+  - name: cffl-structural-time-series-demo-pipeline
+    dag:
+      tasks:
+      - name: evaluate-both-models
+        template: evaluate-both-models
+        dependencies: [fit-and-score-complex-prophet-model, fit-and-score-simple-prophet-model,
+          load-and-preprocess-data]
+        arguments:
+          artifacts:
+          - {name: fit-and-score-complex-prophet-model-prophet_complex, from: '{{tasks.fit-and-score-complex-prophet-model.outputs.artifacts.fit-and-score-complex-prophet-model-prophet_complex}}'}
+          - {name: fit-and-score-simple-prophet-model-prophet_simple, from: '{{tasks.fit-and-score-simple-prophet-model.outputs.artifacts.fit-and-score-simple-prophet-model-prophet_simple}}'}
+          - {name: load-and-preprocess-data-data_df, from: '{{tasks.load-and-preprocess-data.outputs.artifacts.load-and-preprocess-data-data_df}}'}
+      - name: fit-and-score-complex-prophet-model
+        template: fit-and-score-complex-prophet-model
+        dependencies: [load-and-preprocess-data]
+        arguments:
+          artifacts:
+          - {name: load-and-preprocess-data-train_df, from: '{{tasks.load-and-preprocess-data.outputs.artifacts.load-and-preprocess-data-train_df}}'}
+      - name: fit-and-score-simple-prophet-model
+        template: fit-and-score-simple-prophet-model
+        dependencies: [load-and-preprocess-data]
+        arguments:
+          artifacts:
+          - {name: load-and-preprocess-data-train_df, from: '{{tasks.load-and-preprocess-data.outputs.artifacts.load-and-preprocess-data-train_df}}'}
+      - {name: load-and-preprocess-data, template: load-and-preprocess-data}
+  - name: evaluate-both-models
+    container:
+      args: [--prophet_simple, /tmp/inputs/input-0/data, --prophet_complex, /tmp/inputs/input-1/data,
+        --data_df, /tmp/inputs/input-2/data]
+      command: [python3, kfp/scripts/evaluate_models.py]
+      image: andrewrreed/cffl-sts-image:latest
+    inputs:
+      artifacts:
+      - {name: fit-and-score-simple-prophet-model-prophet_simple, path: /tmp/inputs/input-0/data}
+      - {name: fit-and-score-complex-prophet-model-prophet_complex, path: /tmp/inputs/input-1/data}
+      - {name: load-and-preprocess-data-data_df, path: /tmp/inputs/input-2/data}
+  - name: fit-and-score-complex-prophet-model
+    container:
+      args: [--train_df, /tmp/inputs/input-0/data]
+      command: [python3, kfp/scripts/fit_score_complex_prophet_model.py]
+      image: andrewrreed/cffl-sts-image:latest
+    inputs:
+      artifacts:
+      - {name: load-and-preprocess-data-train_df, path: /tmp/inputs/input-0/data}
+    outputs:
+      artifacts:
+      - {name: fit-and-score-complex-prophet-model-prophet_complex, path: /usr/src/app/kfp/data/prophet_complex.csv}
+  - name: fit-and-score-simple-prophet-model
+    container:
+      args: [--train_df, /tmp/inputs/input-0/data]
+      command: [python3, kfp/scripts/fit_score_simple_prophet_model.py]
+      image: andrewrreed/cffl-sts-image:latest
+    inputs:
+      artifacts:
+      - {name: load-and-preprocess-data-train_df, path: /tmp/inputs/input-0/data}
+    outputs:
+      artifacts:
+      - {name: fit-and-score-simple-prophet-model-prophet_simple, path: /usr/src/app/kfp/data/prophet_simple.csv}
+  - name: load-and-preprocess-data
+    container:
+      args: []
+      command: [python3, kfp/scripts/load_and_preprocess.py]
+      image: andrewrreed/cffl-sts-image:latest
+    outputs:
+      artifacts:
+      - {name: load-and-preprocess-data-data_df, path: /usr/src/app/kfp/data/data_df.pkl}
+      - {name: load-and-preprocess-data-train_df, path: /usr/src/app/kfp/data/train_df.pkl}
+  arguments:
+    parameters: []
+  serviceAccountName: pipeline-runner
