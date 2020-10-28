@@ -88,7 +88,7 @@ def cffl_sts_pipeline():
         dsl.InputArgumentPath(_fit_score_simple_prophet_op.outputs['prophet_simple']),
         dsl.InputArgumentPath(_fit_score_complex_prophet_op.outputs['prophet_complex']),
         dsl.InputArgumentPath(_load_and_preprocess_op.outputs['data_df'])
-    ).after( )
+    ).after()
 
 
 # create client connection and execute pipeline run
