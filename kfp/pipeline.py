@@ -33,7 +33,7 @@ def fit_score_simple_prophet_op(data_df):
             '--data_df', data_df
         ],
         file_outputs={
-            'prophet_simple': 'kfp/data/prophet_simple.csv'
+            'prophet_simple': '/usr/src/app/kfp/data/prophet_simple.csv'
         }
     )
 
@@ -47,7 +47,7 @@ def fit_score_complex_prophet_op(data_df):
             '--data_df', data_df
         ],
         file_outputs={
-            'prophet_complex': 'kfp/data/prophet_complex.csv'
+            'prophet_complex': '/usr/src/app/kfp/data/prophet_complex.csv'
         }
     )
 
