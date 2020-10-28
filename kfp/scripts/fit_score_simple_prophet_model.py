@@ -18,6 +18,9 @@ def _fit_score_simple_prophet(train_df):
 
     KFP_DIR = 'kfp/data/'
 
+    if not os.path.exists(KFP_DIR):
+        os.makedirs(KFP_DIR)
+
     forecast[['ds', 'yhat']].to_csv(KFP_DIR + 'prophet_simple.csv', index=False)
 
 if __name__ == '__main__':
