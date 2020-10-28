@@ -5,9 +5,9 @@ from sts.models.prophet import (
     seasonal_daily_prophet_model
 )
 
-def _fit_score_complex_prophet(data_df):
+def _fit_score_complex_prophet(train_df):
 
-    with open(data_df, 'rb') as f:
+    with open(train_df, 'rb') as f:
         df = pickle.load(f)
 
     # ## Prophet (with more complicated seasonality)
@@ -31,6 +31,6 @@ def _fit_score_complex_prophet(data_df):
 if __name__ == '__main__':
     print("-----Fitting and Scoring Complex Prophet Model----")
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_df')
+    parser.add_argument('--train_df')
     args = parser.parse_args()
-    _fit_score_complex_prophet(args.data_df)
+    _fit_score_complex_prophet(args.train_df)
