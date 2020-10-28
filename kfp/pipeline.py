@@ -90,8 +90,14 @@ def cffl_sts_pipeline():
         dsl.InputArgumentPath(_load_and_preprocess_op.outputs['data_df'])
     ).after()
 
-
+# compile and generate compressed kubeflow pipeline file locally
+kfp.compiler.Compiler().compile(cffl_sts_pipeline, 'cffl_sts_pipeline.yaml')
+    
 # create client connection and execute pipeline run
 
 client = kfp.Client(host=args.host)
-client.create_run_from_pipeline_func(cffl_sts_pipeline, arguments={})
+client.create_run_from_pipeline_func(cffl_sts_pipeline,
+                                     arguments={},
+                                     experiment_name='structural_time_series_demo',
+                                     run_name='test'
+)
