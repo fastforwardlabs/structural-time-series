@@ -13,22 +13,22 @@ args = parser.parse_args()
 
 def load_and_preprocess_op():
 
-    return dsl.ContainerOP(
+    return dsl.ContainerOp(
         name='Load and Preprocess Data',
         image='andrewrreed/cffl-sts-image:latest',
-        command='python3 kfp/scripts/load_and_preprocess.py',
+        command=['python3', 'kfp/scripts/load_and_preprocess.py'],
         arguments=[],
         file_outputs={
-            'data_df': 'kfp/data/data_df.pkl'
+            'data_df': '/usr/src/app/kfp/data/data_df.pkl'
         }
     )
 
 def fit_score_simple_prophet_op(data_df):
 
-    return dsl.ContainerOP(
+    return dsl.ContainerOp(
         name='Fit and Score Simple Prophet Model',
         image='andrewrreed/cffl-sts-image:latest',
-        command='python3 kfp/scripts/fit_score_simple_prophet_model.py',
+        command=['python3', 'kfp/scripts/fit_score_simple_prophet_model.py'],
         arguments=[
             '--data_df', data_df
         ],
@@ -39,10 +39,10 @@ def fit_score_simple_prophet_op(data_df):
 
 def fit_score_complex_prophet_op(data_df):
 
-    return dsl.ContainerOP(
+    return dsl.ContainerOp(
         name='Fit and Score Complex Prophet Model',
         image='andrewrreed/cffl-sts-image:latest',
-        command='python3 kfp/scripts/fit_score_complex_prophet_model.py',
+        command=['python3', 'kfp/scripts/fit_score_complex_prophet_model.py'],
         arguments=[
             '--data_df', data_df
         ],
@@ -73,4 +73,4 @@ def cffl_sts_pipeline():
 # create client connection and execute pipeline run
 
 client = kfp.Client(host=args.host)
-client.create_run_from_pipeline_func(cffl_sts_pipeline)
+client.create_run_from_pipeline_func(cffl_sts_pipeline, arguments={})
