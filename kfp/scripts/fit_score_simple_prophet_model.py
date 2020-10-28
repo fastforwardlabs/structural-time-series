@@ -3,9 +3,9 @@ import argparse
 from sts.models.prophet import default_prophet_model
 
 
-def _fit_score_simple_prophet(data_df):
+def _fit_score_simple_prophet(train_df):
 
-    with open(data_df, 'rb') as f:
+    with open(train_df, 'rb') as f:
         df = pickle.load(f)
 
     # ## Prophet (Default)
@@ -23,6 +23,6 @@ def _fit_score_simple_prophet(data_df):
 if __name__ == '__main__':
     print("-----Fitting and Scoring Simple Prophet Model----")
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_df')
+    parser.add_argument('--train_df')
     args = parser.parse_args()
-    _fit_score_simple_prophet(args.data_df)
+    _fit_score_simple_prophet(args.train_df)
