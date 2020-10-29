@@ -37,7 +37,7 @@ def _fit_score_complex_log_prophet(train_df):
     if not os.path.exists(KFP_DIR):
         os.makedirs(KFP_DIR)
 
-    forecast[['ds', 'yhat']].to_csv(KFP_DIR + 'prophet_complex_log.csv', index=False)
+    forecast[['ds', 'yhat']].to_csv(KFP_DIR + 'prophet_log_complex.csv', index=False)
 
 if __name__ == '__main__':
     print("-----Fitting and Scoring Complex Log Prophet Model----")
