@@ -10,7 +10,7 @@ COPY . ./
 
 # install dependencies
 RUN pip3 install --upgrade pip
-RUN pip3 install --user -r requirements.txt
+RUN pip3 install --user -r kfp/requirements.txt
 
 # install the sts module
 RUN pip3 install -e .
