@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import argparse
 
-def _evaluate_models(prophet_simple, prophet_complex, data_df):
+def _evaluate_models(prophet_simple, prophet_complex, prophet_log_complex, data_df):
 
     # load forecasts and actuals
 
@@ -13,6 +13,9 @@ def _evaluate_models(prophet_simple, prophet_complex, data_df):
 
     with open(prophet_complex, 'rb') as f:
         complex_forecast = pd.read_csv(f)
+
+    with open(prophet_log_complex, 'rb') as f:
+        complex_log_forecast = pd.read_csv(f)
     
     with open(data_df, 'rb') as f:
         df = pickle.load(f)
@@ -20,7 +23,7 @@ def _evaluate_models(prophet_simple, prophet_complex, data_df):
 
     # calcualte MAPE for each forecast
 
-    forecasts = ['simple_forecast', 'complex_forecast']
+    forecasts = ['simple_forecast', 'complex_forecast', 'complex_log_forecast']
 
     metrics = {}
     for forecast in forecasts:
@@ -43,10 +46,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--prophet_simple')
     parser.add_argument('--prophet_complex')
+    parser.add_argument('--prophet_log_complex')
     parser.add_argument('--data_df')
     args = parser.parse_args()
     _evaluate_models(
         args.prophet_simple,
         args.prophet_complex,
+        args.prophet_log_complex,
         args.data_df
     )
