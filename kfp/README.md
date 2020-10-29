@@ -12,6 +12,8 @@ This directory contains all necessary artifacts needed to build and/or execute a
 
 > **Note** - This pipeline could easily be abstracted to take in an API Key and cloud storage locations, enabling continuously recurring runs on fresh data and saving out forecast results.
 
+
+
 ## Structure
 
 The folder structure of this directory is as follows:
@@ -24,6 +26,8 @@ The folder structure of this directory is as follows:
 ```
 
 It's also important to take note of the [Dockerfile](../Dockerfile) that lives in the parent directory and defines the publicly available [Docker Image](https://hub.docker.com/repository/docker/andrewrreed/cffl-sts-image) that packages the full repo and supports the Kubeflow Pipeline itself. 
+
+
 
 ## Executing the pipeline
 
