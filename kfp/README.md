@@ -1,6 +1,6 @@
 # Kubeflow Pipelines for Structural-Time-Series Forecasting
 
-**insert image of pipeline here.**
+![image-20201029151053956](/Users/areed/Library/Application Support/typora-user-images/image-20201029151053956.png)
 
 
 
