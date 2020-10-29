@@ -53,7 +53,21 @@ def fit_score_complex_prophet_op(train_df):
         }
     )
 
-def evaluate_models_op(prophet_simple, prophet_complex, data_df):
+def fit_score_complex_log_prophet_op(train_df):
+
+    return dsl.ContainerOp(
+        name='Fit and Score Complex Log Prophet Model',
+        image='andrewrreed/cffl-sts-image:latest',
+        command=['python3', 'kfp/scripts/fit_score_complex_log_prophet_model.py'],
+        arguments=[
+            '--train_df', train_df
+        ],
+        file_outputs={
+            'prophet_log_complex': '/usr/src/app/kfp/data/prophet_log_complex.csv'
+        }
+    )
+
+def evaluate_models_op(prophet_simple, prophet_complex, prophet_log_complex, data_df):
 
     return dsl.ContainerOp(
         name='Evaluate Both Models',
@@ -62,6 +76,7 @@ def evaluate_models_op(prophet_simple, prophet_complex, data_df):
         arguments=[
             '--prophet_simple', prophet_simple,
             '--prophet_complex', prophet_complex,
+            '--prophet_log_complex', prophet_log_complex,
             '--data_df', data_df
         ],
         file_outputs={}
@@ -85,11 +100,16 @@ def cffl_sts_pipeline():
         dsl.InputArgumentPath(_load_and_preprocess_op.outputs['train_df'])
     ).after(_load_and_preprocess_op)
 
+    _fit_score_complex_log_prophet_op = fit_score_complex_log_prophet_op(
+        dsl.InputArgumentPath(_load_and_preprocess_op.outputs['train_df'])
+    ).after(_load_and_preprocess_op)
+
     _evaluate_models_op = evaluate_models_op(
         dsl.InputArgumentPath(_fit_score_simple_prophet_op.outputs['prophet_simple']),
         dsl.InputArgumentPath(_fit_score_complex_prophet_op.outputs['prophet_complex']),
+        dsl.InputArgumentPath(_fit_score_complex_log_prophet_op.outputs['prophet_log_complex']),
         dsl.InputArgumentPath(_load_and_preprocess_op.outputs['data_df'])
-    ).after(_fit_score_complex_prophet_op)
+    ).after(_fit_score_complex_log_prophet_op)
 
     
 if __name__ == '__main__':
