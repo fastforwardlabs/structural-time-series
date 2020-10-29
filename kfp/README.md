@@ -1,6 +1,6 @@
 # Kubeflow Pipelines for Structural-Time-Series Forecasting
 
-![image-20201029151053956](/Users/areed/Library/Application Support/typora-user-images/image-20201029151053956.png)
+![image-20201029151053956](../img/kfp-pipeline-dag.png)
 
 
 
@@ -37,13 +37,13 @@ There are two methods for executing the pipeline:
 
 To run the pre-compiled pipeline as defined in the `cffl_sts_pipeline.yaml` file, simply upload the `.yaml` file as-is to a deployed Kubeflow Pipelines instance:
 
-![image-20201029103857369](/Users/areed/Library/Application Support/typora-user-images/image-20201029103857369.png)
+![image-20201029103857369](../img/kfp-pipeline-gui.png)
 
 
 
 Then, configure a run of the pipeline by selecting the newly uploaded pipeline, selecting an associated experiment, and starting a one-off run:
 
-![image-20201029104431868](/Users/areed/Library/Application Support/typora-user-images/image-20201029104431868.png)
+![image-20201029104431868](../img/kfp-pipeline-cli.png)
 
 
 
