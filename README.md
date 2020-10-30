@@ -138,19 +138,18 @@ See the module for more details.
 To fit models and generate forecasts, we call each script in turn from the `scripts` directory.
 
 ```bash
-cd scripts/
-python3 fit_baseline_model.py
-python3 fit_simple_prophet_model.py
-python3 fit_complex_prophet_model.py
-python3 fit_complex_log_prophet_model.py
+python3 scripts/fit_baseline_model.py
+python3 scripts/fit_simple_prophet_model.py
+python3 scripts/fit_complex_prophet_model.py
+python3 scripts/fit_complex_log_prophet_model.py
 ```
 
 This will fit a series of models of increasing complexity and write their outputs (the mean forecast) to the `data/forecasts` directory.
 Launching the diagnostic app will show the metrics and diagnostic charts for each model.
 
 The most compex model wins.
-We can view its metrics when trained on the validation data (through 2019) by runnig the `validation_metrics.py` script.
-We can then make generate 1000 samples from the model trained on all available training datawith the `make_forecast.py` script.
+We can view its metrics when trained on the validation data (through 2019) by running the `scripts/validation_metrics.py` script.
+We can then generate 1000 samples from the model trained on all available training data with the `scripts/make_forecast.py` script.
 When those samples are written to disk, we can use the forecast app to investigate them.
 
 The additional script, `get_csv.py`, simply fetches and writes data as a csv, which is convenient for any ad hoc analytics and interactive exploration.
