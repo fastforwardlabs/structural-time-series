@@ -30,6 +30,26 @@ tasks:
     short_summary: Running install dependencies job.
     long_summary: >-
       Running the job to install dependencies.  Note that this requires at least 2GB of memory
+
+  - type: create_job
+    name: Train Simple Model
+    entity_label: train_simple_model
+    script: scripts/fit_simple_prophet_model.py
+    arguments: None
+    short_summary: Job to train and export simple prophet model.
+    long_summary: Job to train and export simple prophet model. Note that this requires at least 2GB of memory. 
+    cpu: 1
+    memory: 3
+    environment:
+      TASK_TYPE: CREATE/RUN_JOB
+    kernel: python3
+
+  - type: run_job
+    entity_label: train_simple_model
+    short_summary: Running model training job.
+    long_summary: >-
+      Running the job to train the simple prophet model.
+
   - type: start_application
     name: Diagnostic app
     subdomain: diagnostics
