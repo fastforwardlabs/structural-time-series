@@ -28,16 +28,15 @@ tasks:
   - type: run_job
     entity_label: install_dependencies
     short_summary: Running install dependencies job.
-    long_summary: >-
-      Running the job to install dependencies.  Note that this requires at least 4GB of memory
+    long_summary: Running the job to install dependencies.  Note that this requires at least 4GB of memory
 
   - type: create_job
     name: Launch Parallel Model Fitting
     entity_label: fit_models_parallel
     script: cml/fit_models_parallel.py
     arguments: None
-    short_summary: Job to launch parallel training script execution.
-    long_summary: Job to launch independent training workloads for each forecast script in the /scripts directory.
+    short_summary: Create job to launch parallel training script execution.
+    long_summary: Creates job to launch independent training workloads for each forecast script in the /scripts directory.
     cpu: 1
     memory: 2
     environment:
@@ -47,13 +46,13 @@ tasks:
   - type: run_job
     entity_label: fit_models_parallel
     short_summary: Running job to train forecasts in parallel.
-    long_summary: >-
-      Running job to train forecasts in parallel via CDSW Workers API
+    long_summary: Running job to train forecasts in parallel via CDSW Workers API
 
   - type: start_application
     name: Diagnostic app
     subdomain: diagnostics
     script: apps/launch_diagnostics.py
+    short_summary: Starting forecast diagnostics application
     environment_variables:
       TASK_TYPE: START_APPLICATION
     kernel: python3
@@ -62,6 +61,7 @@ tasks:
     name: Forecast app
     subdomain: forecast
     script: apps/launch_forecast.py
+    short_summary: Starting primary forecast application
     environment_variables:
       TASK_TYPE: START_APPLICATION
     kernel: python3
