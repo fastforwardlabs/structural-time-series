@@ -19,5 +19,22 @@ def fit_models_parallel():
 
     for script in scripts:
         cdsw.launch_workers(n=1, cpu=1, memory=2, script=script)
+    
+    # Force session to persist until each worker job has completed
+    # Check for completion every minute
+    
+    complete = False
+    
+    while complete == False:
+        
+        time.sleep(60)
+        
+        workers = cdsw.list_workers()
+        workers_status = [wkr['status'] for wkr in workers]
+        
+        if all(status == 'succeeded' for status in workers_status):
+            complete = True
+
+
 if __name__ == "__main__":
     fit_models_parallel()
