@@ -14,7 +14,7 @@ environment_variables:
 
 tasks:
   - type: create_job
-    name: Install dependencies
+    name: Install Dependencies
     entity_label: install_dependencies
     script: cml/install_dependencies.py
     arguments: None
@@ -49,7 +49,7 @@ tasks:
     long_summary: Running job to train forecasts in parallel via CDSW Workers API
 
   - type: start_application
-    name: Diagnostic app
+    name: Diagnostic App
     subdomain: diagnostics
     script: apps/launch_diagnostics.py
     short_summary: Starting forecast diagnostics application
@@ -58,7 +58,7 @@ tasks:
     kernel: python3
 
   - type: start_application
-    name: Forecast app
+    name: Forecast App
     subdomain: forecast
     script: apps/launch_forecast.py
     short_summary: Starting primary forecast application
