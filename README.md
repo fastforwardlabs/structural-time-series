@@ -18,6 +18,7 @@ The folder structure of the repo is as follows
 ```
 .
 ├── apps      # Two small Streamlit applications.
+├── cml       # This folder contains scripts that facilitate the project launch on CML.
 ├── data      # This folder contains starter data, and is where forecasts will live.
 ├── scripts   # This is where all the code that does something lives.
 └── sts       # A small library of useful functions.
@@ -75,6 +76,16 @@ apps
 ├── forecast.py             # The primary forecasting interface.
 ├── launch_diagnostics.py   # Launcher script for CDSW/CML
 └── launch_forecast.py      # Launcher script for CDSW/CML
+```
+
+### `cml`
+
+These scripts serve as launch instructions to facilitate the automated project setup on CML. Each script is triggered by the declarative pipeline as defined in the `.project-metadata.yaml` file found the project's root directory.
+
+```
+cml
+├── install_dependencies.py
+└── fit_models_parallel.py
 ```
 
 #### Diagnostics
