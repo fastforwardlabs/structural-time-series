@@ -108,7 +108,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-In CML or CDSW, no virtual env is necessary. Instead, inside a Python 3 session, simply run
+In CML or CDSW, no virtual env is necessary. Instead, inside a Python 3 session (with at least 2 vCPU / 4 GiB Memory), simply run
 
 ```python
 !pip3 install -r requirements.txt     # notice `pip3`, not `pip`
