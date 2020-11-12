@@ -15,40 +15,40 @@ environment_variables:
 tasks:
   - type: create_job
     name: Install dependencies
-    entity_label: install_deps
-    script: install_deps.py
-    arguments: None 
+    entity_label: install_dependencies
+    script: cml/install_dependencies.py
+    arguments: None
     cpu: 1
-    memory: 3
+    memory: 4
     short_summary: Create job to install project dependencies.
     environment:
       TASK_TYPE: CREATE/RUN_JOB
     kernel: python3
 
   - type: run_job
-    entity_label: install_deps
+    entity_label: install_dependencies
     short_summary: Running install dependencies job.
     long_summary: >-
-      Running the job to install dependencies.  Note that this requires at least 2GB of memory
+      Running the job to install dependencies.  Note that this requires at least 4GB of memory
 
   - type: create_job
-    name: Train Simple Model
-    entity_label: train_simple_model
-    script: scripts/fit_simple_prophet_model.py
+    name: Launch Parallel Model Fitting
+    entity_label: fit_models_parallel
+    script: cml/fit_models_parallel.py
     arguments: None
-    short_summary: Job to train and export simple prophet model.
-    long_summary: Job to train and export simple prophet model. Note that this requires at least 2GB of memory. 
+    short_summary: Job to launch parallel training script execution.
+    long_summary: Job to launch independent training workloads for each forecast script in the /scripts directory.
     cpu: 1
-    memory: 3
+    memory: 2
     environment:
       TASK_TYPE: CREATE/RUN_JOB
     kernel: python3
 
   - type: run_job
-    entity_label: train_simple_model
-    short_summary: Running model training job.
+    entity_label: fit_models_parallel
+    short_summary: Running job to train forecasts in parallel.
     long_summary: >-
-      Running the job to train the simple prophet model.
+      Running job to train forecasts in parallel via CDSW Workers API
 
   - type: start_application
     name: Diagnostic app
@@ -57,7 +57,7 @@ tasks:
     environment_variables:
       TASK_TYPE: START_APPLICATION
     kernel: python3
-    
+
   - type: start_application
     name: Forecast app
     subdomain: forecast
