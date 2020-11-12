@@ -15,7 +15,7 @@ def fit_models_parallel():
     script_path = base_path + '/scripts'
 
     scripts = os.listdir(script_path)
-    scripts = [script_path+'/'+script for script in scripts if script[0:3] in ['fit','mak']
+    scripts = [script_path+'/'+script for script in scripts if script[0:3] in ['fit','mak']]
 
     for script in scripts:
         cdsw.launch_workers(n=1, cpu=1, memory=2, script=script)
