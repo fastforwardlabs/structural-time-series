@@ -18,7 +18,7 @@ def fit_models_parallel():
     scripts = [script_path+'/'+script for script in scripts if script[0:3] in ['fit','mak']]
 
     for script in scripts:
-        cdsw.launch_workers(n=1, cpu=1, memory=2, script=script)
+        cdsw.launch_workers(n=1, cpu=1, memory=3, script=script)
     
     # Force session to persist until each worker job has completed
     # Check for completion every minute
