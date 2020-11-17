@@ -13,18 +13,55 @@ environment_variables:
     prompt_user: false
 
 tasks:
+  - type: create_job
+    name: Install Dependencies
+    entity_label: install_dependencies
+    script: cml/install_dependencies.py
+    arguments: None
+    cpu: 2
+    memory: 4
+    short_summary: Create job to install project dependencies.
+    environment:
+      TASK_TYPE: CREATE/RUN_JOB
+    kernel: python3
+
+  - type: run_job
+    entity_label: install_dependencies
+    short_summary: Running install dependencies job.
+    long_summary: Running the job to install dependencies.  Note that this requires at least 4GB of memory
+
+  - type: create_job
+    name: Launch Parallel Model Fitting
+    entity_label: fit_models_parallel
+    script: cml/fit_models_parallel.py
+    arguments: None
+    short_summary: Create job to launch parallel training script execution.
+    long_summary: Creates job to launch independent training workloads for each forecast script in the /scripts directory.
+    cpu: 1
+    memory: 2
+    environment:
+      TASK_TYPE: CREATE/RUN_JOB
+    kernel: python3
+
+  - type: run_job
+    entity_label: fit_models_parallel
+    short_summary: Running job to train forecasts in parallel.
+    long_summary: Running job to train forecasts in parallel via CDSW Workers API
+
   - type: start_application
-    name: Diagnostic app
+    name: Diagnostic App
     subdomain: diagnostics
     script: apps/launch_diagnostics.py
+    short_summary: Starting forecast diagnostics application
     environment_variables:
       TASK_TYPE: START_APPLICATION
     kernel: python3
-    
+
   - type: start_application
-    name: Forecast app
+    name: Forecast App
     subdomain: forecast
     script: apps/launch_forecast.py
+    short_summary: Starting primary forecast application
     environment_variables:
       TASK_TYPE: START_APPLICATION
     kernel: python3

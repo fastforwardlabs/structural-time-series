@@ -18,6 +18,7 @@ The folder structure of the repo is as follows
 ```
 .
 ├── apps      # Two small Streamlit applications.
+├── cml       # This folder contains scripts that facilitate the project launch on CML.
 ├── data      # This folder contains starter data, and is where forecasts will live.
 ├── scripts   # This is where all the code that does something lives.
 └── sts       # A small library of useful functions.
@@ -92,6 +93,16 @@ Second, it provides a few diagnostic charts, including a zoomable forecast.
 
 The primary forecast application (pictured at the top of this README) is a prototype user interface for the forecast this analysis generates.
 
+### `cml`
+
+These scripts serve as launch instructions to facilitate the automated project setup on CML. Each script is triggered by the declarative pipeline as defined in the `.project-metadata.yaml` file found the project's root directory.
+
+```
+cml
+├── install_dependencies.py
+└── fit_models_parallel.py
+```
+
 ## Running through the analysis
 
 To go from a fresh clone of the repo to the final state, follow these instructions in order.
@@ -108,7 +119,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-In CML or CDSW, no virtual env is necessary. Instead, inside a Python 3 session, simply run
+In CML or CDSW, no virtual env is necessary. Instead, inside a Python 3 session (with at least 2 vCPU / 4 GiB Memory), simply run
 
 ```python
 !pip3 install -r requirements.txt     # notice `pip3`, not `pip`
