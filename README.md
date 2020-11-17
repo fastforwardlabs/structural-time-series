@@ -78,16 +78,6 @@ apps
 └── launch_forecast.py      # Launcher script for CDSW/CML
 ```
 
-### `cml`
-
-These scripts serve as launch instructions to facilitate the automated project setup on CML. Each script is triggered by the declarative pipeline as defined in the `.project-metadata.yaml` file found the project's root directory.
-
-```
-cml
-├── install_dependencies.py
-└── fit_models_parallel.py
-```
-
 #### Diagnostics
 
 The diagnostic application serves two purposes.
@@ -102,6 +92,16 @@ Second, it provides a few diagnostic charts, including a zoomable forecast.
 #### Forecast
 
 The primary forecast application (pictured at the top of this README) is a prototype user interface for the forecast this analysis generates.
+
+### `cml`
+
+These scripts serve as launch instructions to facilitate the automated project setup on CML. Each script is triggered by the declarative pipeline as defined in the `.project-metadata.yaml` file found the project's root directory.
+
+```
+cml
+├── install_dependencies.py
+└── fit_models_parallel.py
+```
 
 ## Running through the analysis
 
