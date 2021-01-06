@@ -139,7 +139,7 @@ We use historic California electricity demand data from the [US Energy Informati
 
 A full set of data through October 12th 2020 is included as a starter.
 More recent data can be fetched from the [EIA open data API](https://www.eia.gov/opendata/).
-Doing so requires an API key, which must be set as an the `EIA_API_KEY` environment variable for this project (another name may be used if ).
+Doing so requires an API key, which must be set as the `EIA_API_KEY` environment variable for this project.
 To fetch new data, simply call the `load_california_electricity_demand` function from the `sts.data.loader` module.
 The code is set up to work directly with the json response to the EIA API.
 See the module for more details.

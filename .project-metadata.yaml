@@ -1,6 +1,6 @@
 name: Structural Time Series
 description: California electricity demand forecasting with Prophet.
-author: Cloudera Engineer
+author: Cloudera Inc.
 specification_version: 1.0
 prototype_version: 1.0
 date: "2020-10-14"
@@ -8,8 +8,8 @@ api_version: 1
 
 environment_variables:
   EIA_API_KEY:
-    default: "SUPER AWESOME EIA KEY"
-    description: "EIA open data API key"
+    default: "EIA KEY"
+    description: "Optional EIA open data API key"
     prompt_user: false
 
 tasks:
