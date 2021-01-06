@@ -1,3 +1,43 @@
+# ###########################################################################
+#
+#  CLOUDERA APPLIED MACHINE LEARNING PROTOTYPE (AMP)
+#  (C) Cloudera, Inc. 2020
+#  All rights reserved.
+#
+#  Applicable Open Source License: Apache 2.0
+#
+#  NOTE: Cloudera open source products are modular software products
+#  made up of hundreds of individual components, each of which was
+#  individually copyrighted.  Each Cloudera open source product is a
+#  collective work under U.S. Copyright Law. Your license to use the
+#  collective work is as provided in your written agreement with
+#  Cloudera.  Used apart from the collective work, this file is
+#  licensed for your use pursuant to the open source license
+#  identified above.
+#
+#  This code is provided to you pursuant a written agreement with
+#  (i) Cloudera, Inc. or (ii) a third-party authorized to distribute
+#  this code. If you do not have a written agreement with Cloudera nor
+#  with an authorized and properly licensed third party, you do not
+#  have any rights to access nor to use this code.
+#
+#  Absent a written agreement with Cloudera, Inc. (“Cloudera”) to the
+#  contrary, A) CLOUDERA PROVIDES THIS CODE TO YOU WITHOUT WARRANTIES OF ANY
+#  KIND; (B) CLOUDERA DISCLAIMS ANY AND ALL EXPRESS AND IMPLIED
+#  WARRANTIES WITH RESPECT TO THIS CODE, INCLUDING BUT NOT LIMITED TO
+#  IMPLIED WARRANTIES OF TITLE, NON-INFRINGEMENT, MERCHANTABILITY AND
+#  FITNESS FOR A PARTICULAR PURPOSE; (C) CLOUDERA IS NOT LIABLE TO YOU,
+#  AND WILL NOT DEFEND, INDEMNIFY, NOR HOLD YOU HARMLESS FOR ANY CLAIMS
+#  ARISING FROM OR RELATED TO THE CODE; AND (D)WITH RESPECT TO YOUR EXERCISE
+#  OF ANY RIGHTS GRANTED TO YOU FOR THE CODE, CLOUDERA IS NOT LIABLE FOR ANY
+#  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, PUNITIVE OR
+#  CONSEQUENTIAL DAMAGES INCLUDING, BUT NOT LIMITED TO, DAMAGES
+#  RELATED TO LOST REVENUE, LOST PROFITS, LOSS OF INCOME, LOSS OF
+#  BUSINESS ADVANTAGE OR UNAVAILABILITY, OR LOSS OR CORRUPTION OF
+#  DATA.
+#
+# ###########################################################################
+
 import datetime
 
 import streamlit as st
@@ -15,6 +55,7 @@ st.title("California Electricity Demand Forecast")
 # Data loading and selection
 
 data_loading = st.text("Loading data...")
+
 
 @st.cache(allow_output_mutation=True)
 def load_data():
@@ -36,18 +77,22 @@ start_date, end_date = st.date_input(
     [data.index.min().date(), data.index.max().date()]
 )
 
-subset = data[(data.index.date >= start_date) & (data.index.date <= end_date)].copy()
+subset = data[(data.index.date >= start_date) &
+              (data.index.date <= end_date)].copy()
 data_loading.text("")
+
 
 @st.cache(hash_funcs={pd.DataFrame: lambda _: None})
 def samples(df):
     return df.sample(N_SAMPLES, axis="columns").reset_index().melt(id_vars='ds')
+
 
 @st.cache(hash_funcs={pd.DataFrame: lambda _: None})
 def mean(df):
     return df.mean(axis="columns")
 
 # Main forecast plot
+
 
 st.markdown(f"""
     The chart below shows the mean forecast (based on 1000 samples),
@@ -102,9 +147,9 @@ st.markdown("""
 
 threshold = st.slider(
     "Threshold (Megawatt-hours)",
-    min_value = _min,
-    max_value = _max,
-    format = "%.2e"
+    min_value=_min,
+    max_value=_max,
+    format="%.2e"
 )
 
 prob_exceed = data_sum[data_sum > threshold].count() / data_sum.count()
@@ -122,14 +167,14 @@ st.markdown("""
 """)
 
 hist = px.histogram(
-  data_sum[data_sum > threshold],
-  title="Possible total electricity demand levels",
-  color_discrete_sequence=["#00828c"]
+    data_sum[data_sum > threshold],
+    title="Possible total electricity demand levels",
+    color_discrete_sequence=["#00828c"]
 )
 hist.update_xaxes(range=[_min, _max])
 hist.update_layout(
-  showlegend=False,
-  xaxis_title="Megawatt-hours",
-  yaxis_title="Count (of 1000 simulated futures)"
+    showlegend=False,
+    xaxis_title="Megawatt-hours",
+    yaxis_title="Count (of 1000 simulated futures)"
 )
 st.plotly_chart(hist)
