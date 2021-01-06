@@ -56,6 +56,7 @@ st.title("California Electricity Demand Forecast")
 
 data_loading = st.text("Loading data...")
 
+
 @st.cache(allow_output_mutation=True)
 def load_data():
     data = pd.read_csv("data/forecast.csv", parse_dates=["ds"])
@@ -76,18 +77,22 @@ start_date, end_date = st.date_input(
     [data.index.min().date(), data.index.max().date()]
 )
 
-subset = data[(data.index.date >= start_date) & (data.index.date <= end_date)].copy()
+subset = data[(data.index.date >= start_date) &
+              (data.index.date <= end_date)].copy()
 data_loading.text("")
+
 
 @st.cache(hash_funcs={pd.DataFrame: lambda _: None})
 def samples(df):
     return df.sample(N_SAMPLES, axis="columns").reset_index().melt(id_vars='ds')
+
 
 @st.cache(hash_funcs={pd.DataFrame: lambda _: None})
 def mean(df):
     return df.mean(axis="columns")
 
 # Main forecast plot
+
 
 st.markdown(f"""
     The chart below shows the mean forecast (based on 1000 samples),
@@ -142,9 +147,9 @@ st.markdown("""
 
 threshold = st.slider(
     "Threshold (Megawatt-hours)",
-    min_value = _min,
-    max_value = _max,
-    format = "%.2e"
+    min_value=_min,
+    max_value=_max,
+    format="%.2e"
 )
 
 prob_exceed = data_sum[data_sum > threshold].count() / data_sum.count()
@@ -162,14 +167,14 @@ st.markdown("""
 """)
 
 hist = px.histogram(
-  data_sum[data_sum > threshold],
-  title="Possible total electricity demand levels",
-  color_discrete_sequence=["#00828c"]
+    data_sum[data_sum > threshold],
+    title="Possible total electricity demand levels",
+    color_discrete_sequence=["#00828c"]
 )
 hist.update_xaxes(range=[_min, _max])
 hist.update_layout(
-  showlegend=False,
-  xaxis_title="Megawatt-hours",
-  yaxis_title="Count (of 1000 simulated futures)"
+    showlegend=False,
+    xaxis_title="Megawatt-hours",
+    yaxis_title="Count (of 1000 simulated futures)"
 )
 st.plotly_chart(hist)

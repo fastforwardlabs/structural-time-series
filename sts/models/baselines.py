@@ -92,7 +92,6 @@ def year_ahead_daily_forecast(df):
     return df.shift(periods=52*NUM_DAYS_IN_WEEK).y
 
 
-
 # Collect baseline forecasts
 
 

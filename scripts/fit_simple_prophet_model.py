@@ -56,7 +56,7 @@ df = load_california_electricity_demand(train_only=True)
 
 model = default_prophet_model(df)
 
-future = model.make_future_dataframe(periods = 8760, freq='H')
+future = model.make_future_dataframe(periods=8760, freq='H')
 forecast = model.predict(future)
 
 

@@ -58,6 +58,7 @@ st.title("California Electricity Demand Model Diagnostics")
 
 # first, load true demand data and forecasts
 
+
 def read_forecast(filename):
     name = filename.split(".")[0]
     df = (
@@ -97,8 +98,10 @@ We compare a held out test set (2019) to the whole training set through 2018 and
 of equal length to 2019.
 """
 
+
 def ape(df):
     return pd.DataFrame({m: np.abs(df.y - df[m]) / df.y for m in model_names})
+
 
 st.write(
     pd.DataFrame({
@@ -117,17 +120,21 @@ so that years are approximately aligned.
 MASE measures error relative to the baseline, so a lower score is better.
 """
 
+
 def mase_denominator(df):
     naive_forecast = year_ahead_hourly_forecast(df)
     denom = np.sum(
-      np.abs((naive_forecast - df.y).dropna())
+        np.abs((naive_forecast - df.y).dropna())
     ) / len(naive_forecast.dropna())
     return denom
 
+
 denom = mase_denominator(df_train)
+
 
 def mase(df):
     return pd.DataFrame({m: np.abs(df.y - df[m]) / denom for m in model_names})
+
 
 st.write(
     pd.DataFrame({
@@ -153,7 +160,7 @@ First, we should see the forecast vs true, observed values.
 
 forecast_chart = px.line(
     df, x='ds', y=['y', active_model],
-    color_discrete_sequence=["#ff8300","#00828c"]
+    color_discrete_sequence=["#ff8300", "#00828c"]
 )
 forecast_chart.update_xaxes(
     rangeslider_visible=True,
@@ -253,13 +260,13 @@ autocorrelation_df = pd.DataFrame({
     "autocorrelation": autocorrelation,
     # center confidence intervals on zero,
     # so that null hypothesis is zero autocorrelation
-    "ci_lower": conf_intervals[:,0]-autocorrelation,
-    "ci_upper": conf_intervals[:,1]-autocorrelation
+    "ci_lower": conf_intervals[:, 0]-autocorrelation,
+    "ci_upper": conf_intervals[:, 1]-autocorrelation
 })
 autocorrelation_chart = px.bar(
     autocorrelation_df,
     x=autocorrelation_df.index,
-    y=["autocorrelation","ci_lower", "ci_upper"],
+    y=["autocorrelation", "ci_lower", "ci_upper"],
     color_discrete_sequence=["#00828c", "#ff8300", "#ff8300"],
     barmode="overlay"
 )
@@ -280,8 +287,8 @@ partial_autocorrelation_df = pd.DataFrame({
     "partial_autocorrelation": partial_autocorrelation,
     # center confidence intervals on zero,
     # so that null hypothesis is zero partial autocorrelation
-    "ci_lower": partial_conf_intervals[:,0]-partial_autocorrelation,
-    "ci_upper": partial_conf_intervals[:,1]-partial_autocorrelation
+    "ci_lower": partial_conf_intervals[:, 0]-partial_autocorrelation,
+    "ci_upper": partial_conf_intervals[:, 1]-partial_autocorrelation
 })
 partial_autocorrelation_chart = px.bar(
     partial_autocorrelation_df,

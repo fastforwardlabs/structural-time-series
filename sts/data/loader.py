@@ -46,12 +46,12 @@ import pandas as pd
 
 
 def load_california_electricity_demand(
-    filepath='data/demand.json',
-    api_key_env='EIA_API_KEY',
-    train_only=False):
-    
+        filepath='data/demand.json',
+        api_key_env='EIA_API_KEY',
+        train_only=False):
+
     data = read_or_download_data(filepath, api_key_env)
-        
+
     df = (
         json_to_df(data)
         .rename(columns={0: 'ds', 1: 'y'})
@@ -72,7 +72,7 @@ def read_or_download_data(filepath, api_key_env):
         data = read_json(filepath)
     else:
         api_key = try_get_env(api_key_env)
-        response_json = fetch_california_demand(api_key)  
+        response_json = fetch_california_demand(api_key)
         write_json(response_json, filepath)
         data = read_json(filepath)
 
@@ -130,4 +130,4 @@ def utc_to_pst(df):
 
 
 def remove_2019_and_later(df):
-    return df[df['ds'] < '2019']#.sort_values('ds').reset_index(drop=True)
+    return df[df['ds'] < '2019']

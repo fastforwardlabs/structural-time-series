@@ -66,7 +66,7 @@ df['y'] = df.y.apply(np.log)
 
 model = seasonal_daily_prophet_model(df)
 
-future = model.make_future_dataframe(periods = 8760, freq='H')
+future = model.make_future_dataframe(periods=8760, freq='H')
 seasonal_future = add_season_weekday_indicators(future)
 
 forecast = model.predict(seasonal_future)
