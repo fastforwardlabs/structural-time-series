@@ -21,6 +21,7 @@ The folder structure of the repo is as follows
 ├── cml       # This folder contains scripts that facilitate the project launch on CML.
 ├── data      # This folder contains starter data, and is where forecasts will live.
 ├── scripts   # This is where all the code that does something lives.
+├── kfp   		# A directory of artifacts for building and executing a Kubeflow pipeline
 └── sts       # A small library of useful functions.
 ```
 
