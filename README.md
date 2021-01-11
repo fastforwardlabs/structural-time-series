@@ -95,7 +95,7 @@ The primary forecast application (pictured at the top of this README) is a proto
 
 ### `cml`
 
-These scripts serve as launch instructions to facilitate the automated project setup on CML. Each script is triggered by the declarative pipeline as defined in the `.project-metadata.yaml` file found the project's root directory.
+These scripts serve as launch instructions to facilitate the automated project setup on CML. Each script is triggered by the declarative pipeline as defined in the `.project-metadata.yaml` file found in the project's root directory.
 
 ```
 cml
@@ -111,7 +111,7 @@ To go from a fresh clone of the repo to the final state, follow these instructio
 
 The code and applications within were developed against Python 3.6.9, and are likely also to function with more recent versions of Python.
 
-To install dependencies, first create and activate new virtual environment through your preferred means, then pip install from the requirements file. I recommend:
+To install dependencies, first create and activate a new virtual environment through your preferred means, then pip install from the requirements file. I recommend:
 
 ```python
 python3 -m venv .venv
