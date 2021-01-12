@@ -81,7 +81,7 @@ apps
 #### Diagnostics
 
 The diagnostic application serves two purposes.
-First, it computes reports top level metrics for any forecasts saved in the `data/forecasts` directory.
+First, it computes and reports top level metrics for any forecasts saved in the `data/forecasts` directory.
 
 <img src="img/diagnostic-metrics.png" alt="Diagnostic app showing model metrics" width="40%">
 
@@ -95,7 +95,8 @@ The primary forecast application (pictured at the top of this README) is a proto
 
 ### `cml`
 
-These scripts serve as launch instructions to facilitate the automated project setup on CML. Each script is triggered by the declarative pipeline as defined in the `.project-metadata.yaml` file found in the project's root directory.
+These scripts serve as launch instructions to facilitate the automated project setup on CML.
+Each script is triggered by the declarative pipeline as defined in the `.project-metadata.yaml` file found in the project's root directory.
 
 ```
 cml
@@ -142,7 +143,9 @@ More recent data can be fetched from the [EIA open data API](https://www.eia.gov
 Doing so requires an API key, which must be set as the `EIA_API_KEY` environment variable for this project.
 To fetch new data, simply call the `load_california_electricity_demand` function from the `sts.data.loader` module.
 The code is set up to work directly with the json response to the EIA API.
-See the module for more details.
+By default, each time new data is fetched, it will overwrite the existing data.
+Similarly, when a new forecast is made, it will overwrite the existing forecast.
+It would not be hard to adapt the code to maintain a history of fetched data or forecasts if desired.
 
 ### Scripts
 
@@ -164,8 +167,3 @@ We can then generate 1000 samples from the model trained on all available traini
 When those samples are written to disk, we can use the forecast app to investigate them.
 
 The additional script, `get_csv.py`, simply fetches and writes data as a csv, which is convenient for any ad hoc analytics and interactive exploration.
-
-## Desiderata
-
-- Prophet strictly requires that columns are named `ds` and `y`. We have embraced this convention and coupled to it elsewhere in the codebase. A next step on building a more generically applicable application would be to decouple from this naming convention.
-- By default, each time new data is fetched, it will overwrite the existing data. Similarly when a new forecast is made, it will overwrite the existing forecast. It would not be hard to adapt the code to maintain a history of fetched data or forecasts.
